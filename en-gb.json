@@ -1,0 +1,178 @@
+{
+    "constants": [
+        {
+            "representation": "zero",
+            "value": 0,
+            "number_of_syllables": 2
+        },
+        {
+            "representation": "one",
+            "value": 1,
+            "number_of_syllables": 1
+        },
+        {
+            "representation": "two",
+            "value": 2,
+            "number_of_syllables": 1
+        },
+        {
+            "representation": "three",
+            "value": 3,
+            "number_of_syllables": 1
+        },
+        {
+            "representation": "four",
+            "value": 4,
+            "number_of_syllables": 1
+        },
+        {
+            "representation": "five",
+            "value": 5,
+            "number_of_syllables": 1
+        },
+        {
+            "representation": "six",
+            "value": 6,
+            "number_of_syllables": 1
+        },
+        {
+            "representation": "seven",
+            "value": 7,
+            "number_of_syllables": 2
+        },
+        {
+            "representation": "eight",
+            "value": 8,
+            "number_of_syllables": 1
+        },
+        {
+            "representation": "nine",
+            "value": 9,
+            "number_of_syllables": 1
+        },
+        {
+            "representation": "ten",
+            "value": 10,
+            "number_of_syllables": 1
+        },
+        {
+            "representation": "eleven",
+            "value": 11,
+            "number_of_syllables": 3
+        },
+        {
+            "representation": "twelve",
+            "value": 12,
+            "number_of_syllables": 1
+        },
+        {
+            "representation": "thirteen",
+            "value": 13,
+            "number_of_syllables": 2
+        },
+        {
+            "representation": "fourteen",
+            "value": 14,
+            "number_of_syllables": 2
+        },
+        {
+            "representation": "fifteen",
+            "value": 15,
+            "number_of_syllables": 2
+        },
+        {
+            "representation": "sixteen",
+            "value": 16,
+            "number_of_syllables": 2
+        },
+        {
+            "representation": "seventeen",
+            "value": 17,
+            "number_of_syllables": 3
+        },
+        {
+            "representation": "eighteen",
+            "value": 18,
+            "number_of_syllables": 2
+        },
+        {
+            "representation": "nineteen",
+            "value": 19,
+            "number_of_syllables": 2
+        },
+        {
+            "representation": "twenty",
+            "value": 20,
+            "number_of_syllables": 2
+        },
+        {
+            "representation": "thirty",
+            "value": 30,
+            "number_of_syllables": 2
+        },
+        {
+            "representation": "forty",
+            "value": 40,
+            "number_of_syllables": 2
+        },
+        {
+            "representation": "fifty",
+            "value": 50,
+            "number_of_syllables": 2
+        },
+        {
+            "representation": "sixty",
+            "value": 60,
+            "number_of_syllables": 2
+        },
+        {
+            "representation": "seventy",
+            "value": 70,
+            "number_of_syllables": 3
+        },
+        {
+            "representation": "eighty",
+            "value": 80,
+            "number_of_syllables": 2
+        },
+        {
+            "representation": "ninety",
+            "value": 90,
+            "number_of_syllables": 2
+        },
+        {
+            "representation": "hundred",
+            "value": 100,
+            "number_of_syllables": 2
+        },
+        {
+            "representation": "thousand",
+            "value": 1000,
+            "number_of_syllables": 2
+        },
+        {
+            "representation": "million",
+            "value": 1000000,
+            "number_of_syllables": 2
+        },
+        {
+            "representation": "billion",
+            "value": 1000000000,
+            "number_of_syllables": 2
+        }
+    ],
+    "inverse_constants": [
+        {
+            "representation": "half",
+            "value": 2,
+            "number_of_syllables": 1
+        }
+    ],
+    "operators": [
+        {
+            "representation": "plus",
+            "operator": "add",
+            "number_of_syllables": 1
+        }
+    ]
+}
