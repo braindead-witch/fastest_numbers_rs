@@ -4,7 +4,7 @@ This is not in any way, shape, or form meant to be a 'better' or 'more optimized
 
 **If you would like to contribute, please do so to [the original project](https://github.com/thegraycuber/fastest_numbers/issues/6#issuecomment-3712957318), not mine.**
 
-Or, you could wait until [TheGrayCuber](https://www.youtube.com/@TheGrayCuber) uploads the second video in the series they're cooking up, [which will contain much more sylliness](https://github.com/thegraycuber/fastest_numbers/issues/5#issuecomment-3712953631)!
+Or, you could wait until [TheGrayCuber](https://www.youtube.com/@TheGrayCuber) uploads the second video in the series they're cooking up, [which will contain much more silliness](https://github.com/thegraycuber/fastest_numbers/issues/5#issuecomment-3712953631)!
 
 ## What's the fastest way to say each number? 
 
