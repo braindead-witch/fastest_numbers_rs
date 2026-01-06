@@ -1,3 +1,11 @@
+## DISCLAIMER
+
+This is not in any way, shape, or form meant to be a 'better' or 'more optimized' version of the [original project](https://github.com/thegraycuber/fastest_numbers) by TheGrayCuber. This is just an interesting coding challenge for myself, as I want to learn Rust. 
+
+**If you would like to contribute, please do so to [the original project](https://github.com/thegraycuber/fastest_numbers/issues/6#issuecomment-3712957318), not mine.**
+
+Or, you could wait until [TheGrayCuber](https://www.youtube.com/@TheGrayCuber) uploads the second video in the series they're cooking up, [which will contain much more sylliness](https://github.com/thegraycuber/fastest_numbers/issues/5#issuecomment-3712953631)!
+
 ## What's the fastest way to say each number? 
 
 Please note: pull requests will only be approved for the 'collaborative' titled file or added files in other languages. The existing English version will stay static to match the logic used in the video and on the website.
