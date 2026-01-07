@@ -173,6 +173,36 @@
             "representation": "plus",
             "operator": "add",
             "number_of_syllables": 1
+        },
+        {
+            "representation": "minus",
+            "operator": "subtract",
+            "number_of_syllables": 2
+        },
+        {
+            "representation": "times",
+            "operator": "multiply",
+            "number_of_syllables": 1
+        },
+        {
+            "representation": "over",
+            "operator": "divide",
+            "number_of_syllables": 1
+        },
+        {
+            "representation": "to the",
+            "operator": "exponent",
+            "number_of_syllables": 2
+        },
+        {
+            "representation": "squared",
+            "operator": "squared",
+            "number_of_syllables": 1
+        },
+        {
+            "representation": "cubed",
+            "operator": "cubed",
+            "number_of_syllables": 1
         }
     ]
 }

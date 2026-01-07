@@ -1,4 +1,5 @@
 // Contains all functions for math operations
+use crate::syllables::Dictionary;
 
 pub type Number = i32;
 
@@ -9,10 +10,14 @@ pub enum ArithmeticError {
     NegativeExponent(String)
 }
 
-#[derive(Clone)]
+#[derive(Debug, Clone)]
 pub enum Expression {
-    Constant(Number),
+    Atom(Number),
+    Operation(Operator),
+}
 
+#[derive(Debug, Clone)]
+pub enum Operator {
     // Unary
     Squared(Box<Expression>),
     Cubed(Box<Expression>),
@@ -28,36 +33,45 @@ pub enum Expression {
 impl Expression {
     pub fn eval(&self) -> Result<Number, ArithmeticError> {
         match self {
-            Expression::Constant(x) => Ok(*x),
-            Expression::Squared(x) => Ok(x.eval()? * x.eval()?),
-            Expression::Cubed(x) => Ok(x.eval()? * x.eval()? * x.eval()?),
-            Expression::Add(x, y) => Ok(x.eval()? + y.eval()?),
-            Expression::Subtract(x, y) => Ok(x.eval()? - y.eval()?),
-            Expression::Multiply(x, y) => Ok(x.eval()? * y.eval()?),
-            Expression::Divide(x, y) => {
-                let x_value = x.eval()?;
-                let y_value = y.eval()?;
-                if y_value == 0 {
-                    Err(ArithmeticError::DivideByZero(
-                        format!("Division by zero: {} / {}", x_value, y_value))
-                    )
-                } else if (x_value % y_value) != 0 {
-                    Err(ArithmeticError::DivisionWithRemainder(
-                        format!("Non-integer division: {} / {}", x_value, y_value))
-                    )
-                } else {
-                    Ok(x_value / y_value)
-                }
-            },
-            Expression::Exponent(x, y) => {
-                let x_value = x.eval()?;
-                let y_value = y.eval()?;
-                if y_value < 0 {
-                    Err(ArithmeticError::NegativeExponent(format!("Negative exponent not supported: {}^{}", x_value, y_value)))
-                } else {
-                    Ok(x_value.pow(y_value.try_into().unwrap()))
-                }
-            },
+            Expression::Atom(x) => Ok(*x),
+            Expression::Operation(op) => match op {
+                Operator::Squared(x) => Ok(x.eval()? * x.eval()?),
+                Operator::Cubed(x) => Ok(x.eval()? * x.eval()? * x.eval()?),
+                Operator::Add(x, y) => Ok(x.eval()? + y.eval()?),
+                Operator::Subtract(x, y) => Ok(x.eval()? - y.eval()?),
+                Operator::Multiply(x, y) => Ok(x.eval()? * y.eval()?),
+                Operator::Divide(x, y) => {
+                    let x_value = x.eval()?;
+                    let y_value = y.eval()?;
+                    if y_value == 0 {
+                        Err(ArithmeticError::DivideByZero(
+                            format!("Division by zero: {} / {}", x_value, y_value))
+                        )
+                    } else if (x_value % y_value) != 0 {
+                        Err(ArithmeticError::DivisionWithRemainder(
+                            format!("Non-integer division: {} / {}", x_value, y_value))
+                        )
+                    } else {
+                        Ok(x_value / y_value)
+                    }
+                },
+                Operator::Exponent(x, y) => {
+                    let x_value = x.eval()?;
+                    let y_value = y.eval()?;
+                    if y_value < 0 {
+                        Err(ArithmeticError::NegativeExponent(format!("Negative exponent not supported: {}^{}", x_value, y_value)))
+                    } else {
+                        Ok(x_value.pow(y_value.try_into().unwrap()))
+                    }
+                },
+            }
         }
+    }
+
+    pub fn number_of_syllables(&self, dictionary: &Dictionary) -> Number {
+        todo!();
+        // match self {
+            
+        // }
     }
 }

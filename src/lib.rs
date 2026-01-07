@@ -1,4 +1,3 @@
 mod tests;
-mod math;
-
+pub mod math;
 pub mod syllables;
