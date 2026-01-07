@@ -21,7 +21,7 @@ pub enum Operator {
 pub struct DictionaryConstant {
     pub representation: String,
     pub value: Number,
-    pub number_of_syllables: u32,
+    pub number_of_syllables: Number,
 }
 
 impl PartialOrd for DictionaryConstant {
@@ -40,7 +40,7 @@ impl Ord for DictionaryConstant {
 pub struct DictionaryOperator {
     pub representation: String,
     pub operator: Operator,
-    pub number_of_syllables: u32,
+    pub number_of_syllables: Number,
 }
 
 #[derive(Deserialize, Debug)]
@@ -70,19 +70,57 @@ impl Dictionary {
         None
     }
 
-    pub fn get_from_operator(&self, operator: math::Operator) -> Option<DictionaryOperator> {
+    pub fn get_from_operator(&self, operator: &math::Operator) -> Option<DictionaryOperator> {
         match operator {
-            math::Operator::Add(_, _) => self.find_operator_variant(Operator::Add),
-            math::Operator::Subtract(_, _) => self.find_operator_variant(Operator::Subtract),
-            math::Operator::Multiply(_, _) => self.find_operator_variant(Operator::Multiply),
-            math::Operator::Divide(_, _) => self.find_operator_variant(Operator::Divide),
-            math::Operator::Exponent(_, _) => self.find_operator_variant(Operator::Exponent),
-            math::Operator::Squared(_) => self.find_operator_variant(Operator::Squared),
-            math::Operator::Cubed(_) => self.find_operator_variant(Operator::Cubed),
+            math::Operator::Binary(op, _, _) => {
+                match op {
+                    math::BinaryOperator::Add => self.find_operator_variant(Operator::Add),
+                    math::BinaryOperator::Subtract => self.find_operator_variant(Operator::Subtract),
+                    math::BinaryOperator::Multiply => self.find_operator_variant(Operator::Multiply),
+                    math::BinaryOperator::Divide => self.find_operator_variant(Operator::Divide),
+                    math::BinaryOperator::Exponent => self.find_operator_variant(Operator::Exponent),
+                }
+            },
+            math::Operator::Unary(op, _) => {
+                match op {
+                    math::UnaryOperator::Squared => self.find_operator_variant(Operator::Squared),
+                    math::UnaryOperator::Cubed => self.find_operator_variant(Operator::Cubed),
+                }
+            }
         }
     }
 
     fn find_operator_variant(&self, operator: Operator) -> Option<DictionaryOperator> {
         self.operators.iter().find(|op| op.operator == operator).cloned()
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use crate::syllables::{Dictionary, counter::{NumberRepresentation, value_to_words}};
+
+    #[test]
+    fn test_value_to_word() {
+        let dictionary = Dictionary::from_file("en-gb.json");
+        assert_eq!(
+            value_to_words(5, &dictionary), 
+            Some(NumberRepresentation { value: 5, representation: "five".to_owned(), number_of_syllables: 1 })
+        );
+        assert_eq!(
+            value_to_words(45, &dictionary), 
+            Some(NumberRepresentation { value: 45, representation: "forty five".to_owned(), number_of_syllables: 3 })
+        );
+        assert_eq!(
+            value_to_words(420, &dictionary), 
+            Some(NumberRepresentation { value: 420, representation: "four hundred twenty".to_owned(), number_of_syllables: 5 })
+        );
+        assert_eq!(
+            value_to_words(2147483647, &dictionary), 
+            Some(NumberRepresentation {
+                value: 2147483647,
+                representation: "two billion one hundred forty seven million four hundred eighty three thousand six hundred forty seven".to_owned(),
+                number_of_syllables: 1+2+1+2+2+2+2+1+2+2+1+2+1+2+2+2,
+            })
+        );
     }
 }

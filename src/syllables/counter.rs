@@ -7,7 +7,7 @@ use crate::{math::math::Number, syllables::Dictionary};
 pub struct NumberRepresentation {
     pub value: Number,
     pub representation: String,
-    pub number_of_syllables: u32,
+    pub number_of_syllables: Number,
 }
 
 fn value_to_words_recursive(value: Number, dictionary: &Dictionary) -> NumberRepresentation {
