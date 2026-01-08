@@ -171,37 +171,37 @@
     "operators": [
         {
             "representation": "plus",
-            "operator": "add",
+            "operator": { "binary": "add" },
             "number_of_syllables": 1
         },
         {
             "representation": "minus",
-            "operator": "subtract",
+            "operator": { "binary": "subtract" },
             "number_of_syllables": 2
         },
         {
             "representation": "times",
-            "operator": "multiply",
+            "operator": { "binary": "multiply" },
             "number_of_syllables": 1
         },
         {
             "representation": "over",
-            "operator": "divide",
+            "operator": { "binary": "divide" },
             "number_of_syllables": 1
         },
         {
             "representation": "to the",
-            "operator": "exponent",
+            "operator": { "binary": "exponent" },
             "number_of_syllables": 2
         },
         {
             "representation": "squared",
-            "operator": "squared",
+            "operator": { "unary": "squared" },
             "number_of_syllables": 1
         },
         {
             "representation": "cubed",
-            "operator": "cubed",
+            "operator": { "unary": "cubed" },
             "number_of_syllables": 1
         }
     ]

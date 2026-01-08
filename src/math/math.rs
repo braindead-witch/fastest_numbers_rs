@@ -1,5 +1,6 @@
 // Contains all functions for math operations
 use crate::syllables::{Dictionary, counter::value_to_words};
+use serde::Deserialize;
 
 pub type Number = i32;
 
@@ -7,7 +8,8 @@ pub type Number = i32;
 pub enum ArithmeticError {
     DivideByZero(String),
     DivisionWithRemainder(String),
-    NegativeExponent(String)
+    NegativeExponent(String),
+    OverflowError(String),
 }
 
 #[derive(Debug, Clone)]
@@ -22,22 +24,30 @@ pub enum Operator {
     Binary(BinaryOperator, Box<Expression>, Box<Expression>),
 }
 
-#[derive(Debug, Clone)]
+#[derive(Deserialize, Debug, Clone, PartialEq)]
+#[serde(rename_all = "snake_case")]
 pub enum UnaryOperator {
     Squared,
     Cubed,
 }
 
 impl UnaryOperator {
-    fn apply(&self, x: Number) -> Result<Number, ArithmeticError> {
+    pub fn apply(&self, x: Number) -> Result<Number, ArithmeticError> {
         match self {
-            UnaryOperator::Squared => Ok(x * x),
-            UnaryOperator::Cubed => Ok(x * x * x),
+            UnaryOperator::Squared => match x.checked_mul(x) {
+                Some(v) => Ok(v),
+                None => Err(ArithmeticError::OverflowError(format!("Overflow occurred trying to calculate {} squared", x))),
+            }
+            UnaryOperator::Cubed => match x.checked_pow(3) {
+                Some(v) => Ok(v),
+                None => Err(ArithmeticError::OverflowError(format!("Overflow occurred trying to calculate {} cubed", x))),
+            }
         }
     }
 }
 
-#[derive(Debug, Clone)]
+#[derive(Deserialize, Debug, Clone, PartialEq)]
+#[serde(rename_all = "snake_case")]
 pub enum BinaryOperator {
     Add,
     Subtract,
@@ -47,11 +57,14 @@ pub enum BinaryOperator {
 }
 
 impl BinaryOperator {
-    fn apply(&self, x: Number, y: Number) -> Result<Number, ArithmeticError> {
+    pub fn apply(&self, x: Number, y: Number) -> Result<Number, ArithmeticError> {
         match self {
             BinaryOperator::Add => Ok(x + y),
             BinaryOperator::Subtract => Ok(x - y),
-            BinaryOperator::Multiply => Ok(x * y),
+            BinaryOperator::Multiply => match x.checked_mul(y) {
+                Some(v) => Ok(v),
+                None => Err(ArithmeticError::OverflowError(format!("Overflow occurred trying to calculate {}*{}", x, y))),
+            },
             BinaryOperator::Divide => {
                 if y == 0 {
                     Err(ArithmeticError::DivideByZero(
@@ -69,7 +82,10 @@ impl BinaryOperator {
                 if y < 0 {
                     Err(ArithmeticError::NegativeExponent(format!("Negative exponent not supported: {}^{}", x, y)))
                 } else {
-                    Ok(x.pow(y.try_into().unwrap()))
+                    match x.checked_pow(y.try_into().unwrap()) {
+                        Some(v) => Ok(v),
+                        None => Err(ArithmeticError::OverflowError(format!("Overflow occurred trying to calculate {}^{}", x, y))),
+                    }
                 }
             },
         }

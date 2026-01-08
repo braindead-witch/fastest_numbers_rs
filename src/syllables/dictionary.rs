@@ -1,20 +1,12 @@
 use std::{fs::File, io::BufReader, path::Path};
 use serde::Deserialize;
-use crate::math::math::{self, Number};
+use crate::math::math::{self, BinaryOperator, Number, UnaryOperator};
 
 #[derive(Deserialize, Debug, Clone, PartialEq)]
 #[serde(rename_all = "snake_case")]
 pub enum Operator {
-    // Unary
-    Squared,
-    Cubed,
-
-    // Binary
-    Add,
-    Subtract,
-    Multiply,
-    Divide,
-    Exponent,
+    Unary(UnaryOperator),
+    Binary(BinaryOperator),
 }
 
 #[derive(Deserialize, Debug, Clone, PartialEq, Eq)]
@@ -74,24 +66,27 @@ impl Dictionary {
         match operator {
             math::Operator::Binary(op, _, _) => {
                 match op {
-                    math::BinaryOperator::Add => self.find_operator_variant(Operator::Add),
-                    math::BinaryOperator::Subtract => self.find_operator_variant(Operator::Subtract),
-                    math::BinaryOperator::Multiply => self.find_operator_variant(Operator::Multiply),
-                    math::BinaryOperator::Divide => self.find_operator_variant(Operator::Divide),
-                    math::BinaryOperator::Exponent => self.find_operator_variant(Operator::Exponent),
+                    math::BinaryOperator::Add => self.find_operator_variant(Operator::Binary(BinaryOperator::Add)),
+                    math::BinaryOperator::Subtract => self.find_operator_variant(Operator::Binary(BinaryOperator::Subtract)),
+                    math::BinaryOperator::Multiply => self.find_operator_variant(Operator::Binary(BinaryOperator::Multiply)),
+                    math::BinaryOperator::Divide => self.find_operator_variant(Operator::Binary(BinaryOperator::Divide)),
+                    math::BinaryOperator::Exponent => self.find_operator_variant(Operator::Binary(BinaryOperator::Exponent)),
                 }
             },
             math::Operator::Unary(op, _) => {
                 match op {
-                    math::UnaryOperator::Squared => self.find_operator_variant(Operator::Squared),
-                    math::UnaryOperator::Cubed => self.find_operator_variant(Operator::Cubed),
+                    math::UnaryOperator::Squared => self.find_operator_variant(Operator::Unary(UnaryOperator::Squared)),
+                    math::UnaryOperator::Cubed => self.find_operator_variant(Operator::Unary(UnaryOperator::Cubed)),
                 }
             }
         }
     }
 
     fn find_operator_variant(&self, operator: Operator) -> Option<DictionaryOperator> {
-        self.operators.iter().find(|op| op.operator == operator).cloned()
+        self.operators
+                .iter()
+                .find(|op| op.operator == operator)
+                .cloned()
     }
 }
 
