@@ -12,13 +12,11 @@
 // The algorithm will take items out of the priority queue, starting from the lowest amount
 // of syllables in this case.
 
-use std::{cmp::Reverse, collections::{BinaryHeap, HashMap}};
-use crate::{math::math::Number, syllables::{Dictionary, Operator, counter::{NumberRepresentation, value_to_words}}};
+use std::collections::HashMap;
+use crate::{math::expression::{BinaryOperator, Number, UnaryOperator}, syllables::{Dictionary, Operator, counter::{NumberRepresentation, value_to_words}}};
 
 // Makes program output as silly as possible
 const SILLY_MODE: bool = true;
-
-type PriorityQueueItem = (Reverse<Number>, Number);
 
 pub fn optimize(check_values_up_to: Number, dictionary: &Dictionary) -> HashMap<Number, NumberRepresentation> {
     let mut map_of_best_solutions: HashMap<Number, NumberRepresentation> = HashMap::new();
@@ -31,31 +29,47 @@ pub fn optimize(check_values_up_to: Number, dictionary: &Dictionary) -> HashMap<
         }
     }
 
-    // Priority queue. Using Reverse allows us to make a min-heap
-    let mut heap: BinaryHeap<PriorityQueueItem> = BinaryHeap::new();
-    for (n, best) in &map_of_best_solutions {
-        heap.push((Reverse(best.number_of_syllables), *n));
-    }
-
-    let operators = dictionary.operators.clone();
-
-    // Loop through queue
-    while let Some((Reverse(cost), value)) = heap.pop() {
-        // Don't check if this popped value already had its cost changed
-        if let Some(current_best) = map_of_best_solutions.get(&value)
-            && current_best.number_of_syllables != cost {
-                continue;
+    let unary_operators = dictionary.operators
+        .iter()
+        .filter_map(|op| {
+            if let Operator::Unary(x) = &op.operator {
+                Some((x, op))
+            } else {
+                None
             }
+        });
 
-        // Unary operators; for every unary operator, try to apply to `value`
-        // TODO: filter this `operators` to only contain the Unary operators
-        for dictionary_operator in &operators {
-            if let Operator::Unary(operator) = &dictionary_operator.operator 
-                && let Ok(new_value) = operator.apply(value) {
+    let binary_operators = dictionary.operators
+        .iter()
+        .filter_map(|op| {
+            if let Operator::Binary(x) = &op.operator {
+                Some((x, op))
+            } else {
+                None
+            }
+        });
+
+    // TODO: remove code duplication
+    let mut max_limit = map_of_best_solutions
+        .iter()
+        .map(|(_k,v)| v.number_of_syllables)
+        .max()
+        .expect("Couldn't find number with the maximum number of syllables");
+
+    let mut current_limit = 1;
+
+    while current_limit <= max_limit {
+        // Unary operators
+        for (operator, dictionary_operator) in unary_operators.clone() {
+            let candidates = get_candidates_unary(&map_of_best_solutions, operator.clone(), current_limit, dictionary);
+    
+            for value in candidates {
+                if let Ok(new_value) = operator.apply(value) {
                     // This resulted in a value out of our check-range
                     if new_value >= check_values_up_to {
                         continue;
                     }
+                    let cost = map_of_best_solutions.get(&value).unwrap().number_of_syllables;
                     let new_cost = cost + dictionary_operator.number_of_syllables;
                     if should_update(&map_of_best_solutions, new_value, new_cost) {
                         let new_representation = NumberRepresentation {
@@ -64,38 +78,45 @@ pub fn optimize(check_values_up_to: Number, dictionary: &Dictionary) -> HashMap<
                             representation: format!("{} {}", map_of_best_solutions.get(&value).unwrap().representation, dictionary_operator.representation),
                         };
                         map_of_best_solutions.insert(new_value, new_representation);
-                        // Insert our newly-found value back on the priority queue
-                        heap.push((Reverse(new_cost), new_value));
                     }
                 }
-        }
-
-        // For binary operators: try to combine `value` with every known `u`
-        // Snapshot current best solutions
-        let known_keys: Vec<Number> = map_of_best_solutions.keys().cloned().collect();
-        for u in known_keys {
-            // TODO: filter this `operators` to only contain the Binary operators
-            for dictionary_operator in &operators {
-                if let Operator::Binary(operator) = &dictionary_operator.operator 
-                    && let Ok(new_value) = operator.apply(value, u) {
-                        // This resulted in a value out of our check-range
-                        if new_value >= check_values_up_to {
-                            continue;
-                        }
-                        let new_cost = cost + dictionary_operator.number_of_syllables + map_of_best_solutions.get(&u).unwrap().number_of_syllables;
-                        if should_update(&map_of_best_solutions, new_value, new_cost) {
-                            let new_representation = NumberRepresentation {
-                                value: new_value,
-                                number_of_syllables: new_cost,
-                                representation: format!("{} {} {}", map_of_best_solutions.get(&value).unwrap().representation, dictionary_operator.representation, map_of_best_solutions.get(&u).unwrap().representation),
-                            };
-                            map_of_best_solutions.insert(new_value, new_representation);
-                            // Insert our newly-found value back on the priority queue
-                            heap.push((Reverse(new_cost), new_value));
-                        }
-                    }
             }
         }
+    
+        // Binary operators
+        // For binary operators: try to combine `value` with every known `u`
+        for (operator, dictionary_operator) in binary_operators.clone() {
+            let candidates = get_candidates_binary(&map_of_best_solutions, operator.clone(), current_limit, &dictionary);
+    
+            for (value_left, value_right) in candidates {
+                if let Ok(new_value) = operator.apply(value_left, value_right) {
+                    // This resulted in a value out of our check-range
+                    if new_value >= check_values_up_to {
+                        continue;
+                    }
+                    let cost_left = map_of_best_solutions.get(&value_left).unwrap().number_of_syllables;
+                    let cost_right = map_of_best_solutions.get(&value_right).unwrap().number_of_syllables;
+                    let new_cost = cost_left + cost_right + dictionary_operator.number_of_syllables;
+                    if should_update(&map_of_best_solutions, new_value, new_cost) {
+                        let new_representation = NumberRepresentation {
+                            value: new_value,
+                            number_of_syllables: new_cost,
+                            representation: format!("{} {} {}", map_of_best_solutions.get(&value_left).unwrap().representation, dictionary_operator.representation, map_of_best_solutions.get(&value_right).unwrap().representation),
+                        };
+                        map_of_best_solutions.insert(new_value, new_representation);
+                    }
+                }
+            }
+        }
+
+        current_limit += 1;
+
+        // Update limit, as we might've lowered this limit in a previous iteration
+        max_limit = map_of_best_solutions
+            .iter()
+            .map(|(_k,v)| v.number_of_syllables)
+            .max()
+            .expect("Couldn't find number with the maximum number of syllables");
     }
 
     map_of_best_solutions
@@ -110,6 +131,47 @@ fn should_update(best_solutions: &HashMap<Number, NumberRepresentation>, new_val
         },
         None => false,
     }
+}
+
+fn get_candidates_binary(best_solutions: &HashMap<Number, NumberRepresentation>, operator: BinaryOperator, goal_length: Number, dictionary: &Dictionary) -> Vec<(Number, Number)> {
+    // Check syllable length, and prune any combinations that would lead to
+    // a syllable length >  goal.syllable_length
+    let operator_length = dictionary.get_from_dictionary_operator(Operator::Binary(operator)).unwrap().number_of_syllables;
+    let mut result = Vec::new();
+    
+    // First: get all candidates N_first where N_first + N_operator < N_goal
+    let mut first_pass_candidates = Vec::new();
+    for (k, v) in best_solutions {
+        if v.number_of_syllables + operator_length < goal_length {
+            first_pass_candidates.push(k);
+        }
+    }
+
+    // Second pass: get all candidates N_second where N_first + N_operator + N_second < N_goal
+    // NOTE: This probably has many mirror duplicates, like (5, 2) and (2, 5). Let's not worry
+    // about that for now.
+    for (k, v) in best_solutions {
+        for u in &first_pass_candidates {
+            let first_pass_length = best_solutions.get(u).unwrap().number_of_syllables;
+            if v.number_of_syllables + operator_length + first_pass_length < goal_length {
+                result.push((**u, *k));
+            }
+        }
+    }
+
+    result
+}
+
+fn get_candidates_unary(best_solutions: &HashMap<Number, NumberRepresentation>, operator: UnaryOperator, goal_length: Number, dictionary: &Dictionary) -> Vec<Number> {
+    let operator_length = dictionary.get_from_dictionary_operator(Operator::Unary(operator)).unwrap().number_of_syllables;
+    let mut result = Vec::new();
+    for (k, v) in best_solutions {
+        // TODO: SILLY_MODE
+        if v.number_of_syllables + operator_length < goal_length {
+            result.push(*k);
+        }
+    }
+    result
 }
 
 #[cfg(test)]
@@ -149,5 +211,13 @@ mod tests {
         // "ten plus one". Both have the same syllies, so it's ok
         assert_eq!(optimized.get(&11).unwrap().number_of_syllables, 3);
         assert_eq!(optimized.get(&37).unwrap().number_of_syllables, 4);
+    }
+
+    #[test]
+    fn test_hard() {
+        let dictionary = Dictionary::from_file("en-gb.json");
+        let optimized = optimize(10000, &dictionary);
+
+        assert_eq!(optimized.get(&1234).unwrap().number_of_syllables, 6);
     }
 }

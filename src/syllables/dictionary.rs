@@ -1,6 +1,6 @@
 use std::{fs::File, io::BufReader, path::Path};
 use serde::Deserialize;
-use crate::math::math::{self, BinaryOperator, Number, UnaryOperator};
+use crate::math::expression::{self, BinaryOperator, Number, UnaryOperator};
 
 #[derive(Deserialize, Debug, Clone, PartialEq)]
 #[serde(rename_all = "snake_case")]
@@ -62,31 +62,31 @@ impl Dictionary {
         None
     }
 
-    pub fn get_from_operator(&self, operator: &math::Operator) -> Option<DictionaryOperator> {
+    pub fn get_from_operator(&self, operator: &expression::Operator) -> Option<DictionaryOperator> {
         match operator {
-            math::Operator::Binary(op, _, _) => {
+            expression::Operator::Binary(op, _, _) => {
                 match op {
-                    math::BinaryOperator::Add => self.find_operator_variant(Operator::Binary(BinaryOperator::Add)),
-                    math::BinaryOperator::Subtract => self.find_operator_variant(Operator::Binary(BinaryOperator::Subtract)),
-                    math::BinaryOperator::Multiply => self.find_operator_variant(Operator::Binary(BinaryOperator::Multiply)),
-                    math::BinaryOperator::Divide => self.find_operator_variant(Operator::Binary(BinaryOperator::Divide)),
-                    math::BinaryOperator::Exponent => self.find_operator_variant(Operator::Binary(BinaryOperator::Exponent)),
+                    expression::BinaryOperator::Add => self.get_from_dictionary_operator(Operator::Binary(BinaryOperator::Add)),
+                    expression::BinaryOperator::Subtract => self.get_from_dictionary_operator(Operator::Binary(BinaryOperator::Subtract)),
+                    expression::BinaryOperator::Multiply => self.get_from_dictionary_operator(Operator::Binary(BinaryOperator::Multiply)),
+                    expression::BinaryOperator::Divide => self.get_from_dictionary_operator(Operator::Binary(BinaryOperator::Divide)),
+                    expression::BinaryOperator::Exponent => self.get_from_dictionary_operator(Operator::Binary(BinaryOperator::Exponent)),
                 }
             },
-            math::Operator::Unary(op, _) => {
+            expression::Operator::Unary(op, _) => {
                 match op {
-                    math::UnaryOperator::Squared => self.find_operator_variant(Operator::Unary(UnaryOperator::Squared)),
-                    math::UnaryOperator::Cubed => self.find_operator_variant(Operator::Unary(UnaryOperator::Cubed)),
+                    expression::UnaryOperator::Squared => self.get_from_dictionary_operator(Operator::Unary(UnaryOperator::Squared)),
+                    expression::UnaryOperator::Cubed => self.get_from_dictionary_operator(Operator::Unary(UnaryOperator::Cubed)),
                 }
             }
         }
     }
 
-    fn find_operator_variant(&self, operator: Operator) -> Option<DictionaryOperator> {
+    pub fn get_from_dictionary_operator(&self, operator: Operator) -> Option<DictionaryOperator> {
         self.operators
-                .iter()
-                .find(|op| op.operator == operator)
-                .cloned()
+            .iter()
+            .find(|op| op.operator == operator)
+            .cloned()
     }
 }
 
