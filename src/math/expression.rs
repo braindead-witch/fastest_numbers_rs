@@ -36,12 +36,18 @@ impl UnaryOperator {
         match self {
             UnaryOperator::Squared => match x.checked_mul(x) {
                 Some(v) => Ok(v),
-                None => Err(ArithmeticError::OverflowError(format!("Overflow occurred trying to calculate {} squared", x))),
-            }
+                None => Err(ArithmeticError::OverflowError(format!(
+                    "Overflow occurred trying to calculate {} squared",
+                    x
+                ))),
+            },
             UnaryOperator::Cubed => match x.checked_pow(3) {
                 Some(v) => Ok(v),
-                None => Err(ArithmeticError::OverflowError(format!("Overflow occurred trying to calculate {} cubed", x))),
-            }
+                None => Err(ArithmeticError::OverflowError(format!(
+                    "Overflow occurred trying to calculate {} cubed",
+                    x
+                ))),
+            },
         }
     }
 
@@ -50,19 +56,25 @@ impl UnaryOperator {
             UnaryOperator::Squared => {
                 let lhs = x.isqrt();
                 if lhs * lhs != x {
-                    Err(ArithmeticError::NonIntegerSolution(format!("{}^2 != {}", lhs, x)))
+                    Err(ArithmeticError::NonIntegerSolution(format!(
+                        "{}^2 != {}",
+                        lhs, x
+                    )))
                 } else {
                     Ok(lhs)
                 }
-            },
+            }
             UnaryOperator::Cubed => {
                 let lhs = (x as f64).powf(1.0 / 3.0) as Number; // Try to take cube root
                 if lhs * lhs * lhs != x {
-                    Err(ArithmeticError::NonIntegerSolution(format!("{}^3 != {}", lhs, x)))
+                    Err(ArithmeticError::NonIntegerSolution(format!(
+                        "{}^3 != {}",
+                        lhs, x
+                    )))
                 } else {
                     Ok(lhs)
                 }
-            },
+            }
         }
     }
 }
@@ -84,19 +96,38 @@ impl BinaryOperator {
             BinaryOperator::Subtract => Ok(x - y),
             BinaryOperator::Multiply => match x.checked_mul(y) {
                 Some(v) => Ok(v),
-                None => Err(ArithmeticError::OverflowError(format!("Overflow occurred trying to calculate {}*{}", x, y))),
+                None => Err(ArithmeticError::OverflowError(format!(
+                    "Overflow occurred trying to calculate {}*{}",
+                    x, y
+                ))),
             },
             BinaryOperator::Divide => Self::checked_divide(x, y),
             BinaryOperator::Exponent => {
                 if y < 0 {
-                    Err(ArithmeticError::NegativeExponent(format!("Negative exponent not supported: {}^{}", x, y)))
+                    Err(ArithmeticError::NegativeExponent(format!(
+                        "Negative exponent not supported: {}^{}",
+                        x, y
+                    )))
                 } else {
                     match x.checked_pow(y.try_into().unwrap()) {
                         Some(v) => Ok(v),
-                        None => Err(ArithmeticError::OverflowError(format!("Overflow occurred trying to calculate {}^{}", x, y))),
+                        None => Err(ArithmeticError::OverflowError(format!(
+                            "Overflow occurred trying to calculate {}^{}",
+                            x, y
+                        ))),
                     }
                 }
-            },
+            }
+        }
+    }
+
+    pub fn is_commutative(&self) -> bool {
+        match self {
+            BinaryOperator::Add => true,
+            BinaryOperator::Subtract => false,
+            BinaryOperator::Multiply => true,
+            BinaryOperator::Divide => false,
+            BinaryOperator::Exponent => false,
         }
     }
 
@@ -105,29 +136,39 @@ impl BinaryOperator {
             BinaryOperator::Add => Ok(result - lhs),
             BinaryOperator::Subtract => Ok(lhs - result), // lhs - rhs = result
             BinaryOperator::Multiply => Self::checked_divide(result, lhs), // rhs = result/lhs
-            BinaryOperator::Divide => { // lhs / rhs = result => rhs = lhs / result
+            BinaryOperator::Divide => {
+                // lhs / rhs = result => rhs = lhs / result
                 if lhs == 0 {
-                    Err(ArithmeticError::DivideByZero(format!("Will result in a division by zero: {lhs}/rhs = {result}")))
+                    Err(ArithmeticError::DivideByZero(format!(
+                        "Will result in a division by zero: {lhs}/rhs = {result}"
+                    )))
                 } else {
                     Self::checked_divide(lhs, result)
                 }
-            },
+            }
             BinaryOperator::Exponent => {
                 // lhs ^ rhs = result
                 // rhs * log(lhs) = log(result)
                 // rhs = log(result)/log(lhs)
                 if result <= 0 || lhs <= 0 {
-                    return Err(ArithmeticError::NegativeExponent(format!("Can't take logarithm of a negative value, or zero: {lhs}^x={result}")));
+                    return Err(ArithmeticError::NegativeExponent(format!(
+                        "Can't take logarithm of a negative value, or zero: {lhs}^x={result}"
+                    )));
                 }
                 let log_lhs = lhs.ilog2();
                 if log_lhs == 0 {
-                    return Err(ArithmeticError::DivideByZero(format!("Attempted to divide by zero: {lhs}^x = {result}")));
+                    return Err(ArithmeticError::DivideByZero(format!(
+                        "Attempted to divide by zero: {lhs}^x = {result}"
+                    )));
                 }
                 let rhs = (result.ilog2() / log_lhs) as Number;
                 if lhs.pow(rhs.try_into().unwrap()) == result {
                     Ok(rhs)
                 } else {
-                    Err(ArithmeticError::NonIntegerSolution(format!("{}^{} != {}", lhs, rhs, result)))
+                    Err(ArithmeticError::NonIntegerSolution(format!(
+                        "{}^{} != {}",
+                        lhs, rhs, result
+                    )))
                 }
             }
         }
@@ -135,13 +176,15 @@ impl BinaryOperator {
 
     fn checked_divide(x: Number, y: Number) -> Result<Number, ArithmeticError> {
         if y == 0 {
-            Err(ArithmeticError::DivideByZero(
-                format!("Division by zero: {} / {}", x, y))
-            )
+            Err(ArithmeticError::DivideByZero(format!(
+                "Division by zero: {} / {}",
+                x, y
+            )))
         } else if (x % y) != 0 {
-            Err(ArithmeticError::NonIntegerSolution(
-                format!("Non-integer division: {} / {}", x, y))
-            )
+            Err(ArithmeticError::NonIntegerSolution(format!(
+                "Non-integer division: {} / {}",
+                x, y
+            )))
         } else {
             Ok(x / y)
         }
@@ -153,13 +196,9 @@ impl Expression {
         match self {
             Expression::Atom(x) => Ok(*x),
             Expression::Operation(op) => match op {
-                Operator::Unary(op, x) => {
-                    op.apply(x.eval()?)
-                },
-                Operator::Binary(op, x, y) => {
-                    op.apply(x.eval()?, y.eval()?)
-                }
-            }
+                Operator::Unary(op, x) => op.apply(x.eval()?),
+                Operator::Binary(op, x, y) => op.apply(x.eval()?, y.eval()?),
+            },
         }
     }
 
@@ -171,53 +210,70 @@ impl Expression {
                 } else {
                     panic!("Couldn't convert to words: {}", x);
                 }
-            },
+            }
             Expression::Operation(op) => {
                 // Sum of LHS + Operator + RHS
-                let number_of_syllables_operator = if let Some(item) = dictionary.get_from_operator(op) {
-                    item.number_of_syllables
-                } else {
-                    panic!("Operator {:#?} not in dictionary", op);
-                };
+                let number_of_syllables_operator =
+                    if let Some(item) = dictionary.get_from_operator(op) {
+                        item.number_of_syllables
+                    } else {
+                        panic!("Operator {:#?} not in dictionary", op);
+                    };
 
                 match op {
-                    Operator::Unary(_, x) => number_of_syllables_operator + x.number_of_syllables(dictionary),
-                    Operator::Binary(_, x, y) => number_of_syllables_operator + x.number_of_syllables(dictionary) + y.number_of_syllables(dictionary),
+                    Operator::Unary(_, x) => {
+                        number_of_syllables_operator + x.number_of_syllables(dictionary)
+                    }
+                    Operator::Binary(_, x, y) => {
+                        number_of_syllables_operator
+                            + x.number_of_syllables(dictionary)
+                            + y.number_of_syllables(dictionary)
+                    }
                 }
-            },
+            }
         }
     }
 }
 
 #[cfg(test)]
 mod tests {
-    use crate::{math::expression::{Expression, Operator, BinaryOperator, UnaryOperator}, syllables::Dictionary};
+    use crate::{
+        math::expression::{BinaryOperator, Expression, Operator, UnaryOperator},
+        syllables::Dictionary,
+    };
 
-    fn make_expressions() -> (Expression, Expression, Expression, Expression, Expression, Expression) {
+    fn make_expressions() -> (
+        Expression,
+        Expression,
+        Expression,
+        Expression,
+        Expression,
+        Expression,
+    ) {
         let expr1 = Expression::Atom(3);
         let expr2 = Expression::Operation(Operator::Unary(
             UnaryOperator::Squared,
-            Box::new(expr1.clone())
+            Box::new(expr1.clone()),
         ));
         let expr3 = Expression::Operation(Operator::Binary(
             BinaryOperator::Multiply,
             Box::new(expr2.clone()),
-            Box::new(Expression::Atom(5))
+            Box::new(Expression::Atom(5)),
         ));
         let expr4 = Expression::Operation(Operator::Binary(
             BinaryOperator::Divide,
             Box::new(expr3.clone()),
-            Box::new(Expression::Atom(3))
+            Box::new(Expression::Atom(3)),
         ));
         let expr4_illegal_divide = Expression::Operation(Operator::Binary(
             BinaryOperator::Divide,
             Box::new(expr3.clone()),
-            Box::new(Expression::Atom(7))
+            Box::new(Expression::Atom(7)),
         ));
         let expr5 = Expression::Operation(Operator::Binary(
             BinaryOperator::Exponent,
             Box::new(expr1.clone()),
-            Box::new(Expression::Atom(3))
+            Box::new(Expression::Atom(3)),
         ));
 
         (expr1, expr2, expr3, expr4, expr4_illegal_divide, expr5)
@@ -262,4 +318,3 @@ mod tests {
         assert_eq!(expr5.number_of_syllables(&dictionary), 4);
     }
 }
-

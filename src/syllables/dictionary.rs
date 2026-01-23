@@ -1,6 +1,6 @@
-use std::{fs::File, io::BufReader, path::Path};
-use serde::Deserialize;
 use crate::math::expression::{self, BinaryOperator, Number, UnaryOperator};
+use serde::Deserialize;
+use std::{fs::File, io::BufReader, path::Path};
 
 #[derive(Deserialize, Debug, Clone, PartialEq)]
 #[serde(rename_all = "snake_case")]
@@ -66,19 +66,28 @@ impl Dictionary {
         match operator {
             expression::Operator::Binary(op, _, _) => {
                 match op {
-                    expression::BinaryOperator::Add => self.get_from_dictionary_operator(Operator::Binary(BinaryOperator::Add)),
-                    expression::BinaryOperator::Subtract => self.get_from_dictionary_operator(Operator::Binary(BinaryOperator::Subtract)),
-                    expression::BinaryOperator::Multiply => self.get_from_dictionary_operator(Operator::Binary(BinaryOperator::Multiply)),
-                    expression::BinaryOperator::Divide => self.get_from_dictionary_operator(Operator::Binary(BinaryOperator::Divide)),
-                    expression::BinaryOperator::Exponent => self.get_from_dictionary_operator(Operator::Binary(BinaryOperator::Exponent)),
-                }
-            },
-            expression::Operator::Unary(op, _) => {
-                match op {
-                    expression::UnaryOperator::Squared => self.get_from_dictionary_operator(Operator::Unary(UnaryOperator::Squared)),
-                    expression::UnaryOperator::Cubed => self.get_from_dictionary_operator(Operator::Unary(UnaryOperator::Cubed)),
+                    expression::BinaryOperator::Add => {
+                        self.get_from_dictionary_operator(Operator::Binary(BinaryOperator::Add))
+                    }
+                    expression::BinaryOperator::Subtract => self
+                        .get_from_dictionary_operator(Operator::Binary(BinaryOperator::Subtract)),
+                    expression::BinaryOperator::Multiply => self
+                        .get_from_dictionary_operator(Operator::Binary(BinaryOperator::Multiply)),
+                    expression::BinaryOperator::Divide => {
+                        self.get_from_dictionary_operator(Operator::Binary(BinaryOperator::Divide))
+                    }
+                    expression::BinaryOperator::Exponent => self
+                        .get_from_dictionary_operator(Operator::Binary(BinaryOperator::Exponent)),
                 }
             }
+            expression::Operator::Unary(op, _) => match op {
+                expression::UnaryOperator::Squared => {
+                    self.get_from_dictionary_operator(Operator::Unary(UnaryOperator::Squared))
+                }
+                expression::UnaryOperator::Cubed => {
+                    self.get_from_dictionary_operator(Operator::Unary(UnaryOperator::Cubed))
+                }
+            },
         }
     }
 
@@ -92,25 +101,40 @@ impl Dictionary {
 
 #[cfg(test)]
 mod tests {
-    use crate::syllables::{Dictionary, counter::{NumberRepresentation, value_to_words}};
+    use crate::syllables::{
+        Dictionary,
+        counter::{NumberRepresentation, value_to_words},
+    };
 
     #[test]
     fn test_value_to_word() {
         let dictionary = Dictionary::from_file("en-gb.json");
         assert_eq!(
-            value_to_words(5, &dictionary), 
-            Some(NumberRepresentation { value: 5, representation: "five".to_owned(), number_of_syllables: 1 })
+            value_to_words(5, &dictionary),
+            Some(NumberRepresentation {
+                value: 5,
+                representation: "five".to_owned(),
+                number_of_syllables: 1
+            })
         );
         assert_eq!(
-            value_to_words(45, &dictionary), 
-            Some(NumberRepresentation { value: 45, representation: "forty five".to_owned(), number_of_syllables: 3 })
+            value_to_words(45, &dictionary),
+            Some(NumberRepresentation {
+                value: 45,
+                representation: "forty five".to_owned(),
+                number_of_syllables: 3
+            })
         );
         assert_eq!(
-            value_to_words(420, &dictionary), 
-            Some(NumberRepresentation { value: 420, representation: "four hundred twenty".to_owned(), number_of_syllables: 5 })
+            value_to_words(420, &dictionary),
+            Some(NumberRepresentation {
+                value: 420,
+                representation: "four hundred twenty".to_owned(),
+                number_of_syllables: 5
+            })
         );
         assert_eq!(
-            value_to_words(2147483647, &dictionary), 
+            value_to_words(2147483647, &dictionary),
             Some(NumberRepresentation {
                 value: 2147483647,
                 representation: "two billion one hundred forty seven million four hundred eighty three thousand six hundred forty seven".to_owned(),

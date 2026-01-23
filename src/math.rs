@@ -1,2 +1,2 @@
-pub mod optimize;
 pub mod expression;
+pub mod optimize;

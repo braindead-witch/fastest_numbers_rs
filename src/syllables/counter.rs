@@ -11,9 +11,9 @@ pub struct NumberRepresentation {
 }
 
 fn value_to_words_recursive(value: Number, dictionary: &Dictionary) -> NumberRepresentation {
-    let mut result = NumberRepresentation { 
+    let mut result = NumberRepresentation {
         value,
-        representation: "".to_owned(), 
+        representation: "".to_owned(),
         number_of_syllables: 0,
     };
 
@@ -54,7 +54,7 @@ fn value_to_words_recursive(value: Number, dictionary: &Dictionary) -> NumberRep
                 let new = value_to_words_recursive(value % constant.value, dictionary);
                 result = NumberRepresentation {
                     value,
-                    representation: result.representation + " " + &new.representation, 
+                    representation: result.representation + " " + &new.representation,
                     number_of_syllables: result.number_of_syllables + new.number_of_syllables,
                 }
             }
@@ -72,8 +72,8 @@ pub fn value_to_words(value: Number, dictionary: &Dictionary) -> Option<NumberRe
         let value = dictionary.get_from_value(0)?;
         return Some(NumberRepresentation {
             value: value.value,
-            representation: value.representation, 
-            number_of_syllables: value.number_of_syllables 
+            representation: value.representation,
+            number_of_syllables: value.number_of_syllables,
         });
     }
     Some(value_to_words_recursive(value, dictionary))
