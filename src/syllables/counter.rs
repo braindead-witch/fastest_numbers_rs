@@ -1,9 +1,12 @@
 // https://www.geeksforgeeks.org/dsa/convert-number-to-words/
 // Using the recursive algorithm here, with the goal for allowing more general dictionaries, hopefully making language support easier.
 
+use serde::{Deserialize, Serialize};
+
 use crate::{math::expression::Number, syllables::Dictionary};
 
 #[derive(PartialEq, Eq, Debug, Clone, Hash)]
+#[derive(Serialize, Deserialize)]
 pub struct NumberRepresentation {
     pub value: Number,
     pub representation: String,

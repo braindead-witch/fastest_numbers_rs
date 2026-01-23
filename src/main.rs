@@ -1,7 +1,7 @@
-use fastest_numbers::{math::optimize::optimize, syllables::Dictionary};
+use fastest_numbers::{math::{export::ExportType, optimize::optimize}, syllables::Dictionary};
 
 fn main() {
-    let dictionary = Dictionary::from_file("en-gb.json");
+    let dictionary = Dictionary::from_file("languages/en-gb.json");
     let optimized = optimize(100000, &dictionary);
-    println!("{:#?}", optimized.inner);
+    let _ = optimized.export(ExportType::Json, "results/results_en-gb.json");
 }

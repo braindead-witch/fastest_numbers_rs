@@ -1,7 +1,7 @@
 // Optimize a given expression (aka the hard part of this program!)
 
 use crate::{
-    math::expression::{BinaryOperator, Number, UnaryOperator},
+    math::{export::OptimizedResult, expression::{BinaryOperator, Number, UnaryOperator}},
     syllables::{
         Dictionary, Operator,
         counter::{NumberRepresentation, value_to_words},
@@ -11,10 +11,6 @@ use std::collections::HashMap;
 
 // Makes program output as silly as possible
 const SILLY_MODE: bool = true;
-
-pub struct OptimizedResult {
-    pub inner: HashMap<Number, NumberRepresentation>,
-}
 
 pub fn optimize(check_values_up_to: Number, dictionary: &Dictionary) -> OptimizedResult {
     let mut map_of_best_solutions: HashMap<Number, NumberRepresentation> = HashMap::new();
