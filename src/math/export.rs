@@ -18,14 +18,12 @@ impl OptimizedResult {
         let file = File::create(filepath)?;
         match flavor {
             ExportType::Json => {
-                let mut sorted_inner: Vec<_> = self.inner
-                    .iter()
-                    .collect();
+                let mut sorted_inner: Vec<_> = self.inner.iter().collect();
                 sorted_inner.sort_by_key(|k| k.0);
                 serde_json::to_writer_pretty(file, &sorted_inner)
-                    .map_err(|e| std::io::Error::new(std::io::ErrorKind::Other, e))?;
+                    .map_err(std::io::Error::other)?;
                 Ok(())
-            },
+            }
         }
     }
 }

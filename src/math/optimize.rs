@@ -1,7 +1,10 @@
 // Optimize a given expression (aka the hard part of this program!)
 
 use crate::{
-    math::{export::OptimizedResult, expression::{BinaryOperator, Number, UnaryOperator}},
+    math::{
+        export::OptimizedResult,
+        expression::{BinaryOperator, Number, UnaryOperator},
+    },
     syllables::{
         Dictionary, Operator,
         counter::{NumberRepresentation, value_to_words},

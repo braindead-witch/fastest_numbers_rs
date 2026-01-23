@@ -5,8 +5,7 @@ use serde::{Deserialize, Serialize};
 
 use crate::{math::expression::Number, syllables::Dictionary};
 
-#[derive(PartialEq, Eq, Debug, Clone, Hash)]
-#[derive(Serialize, Deserialize)]
+#[derive(PartialEq, Eq, Debug, Clone, Hash, Serialize, Deserialize)]
 pub struct NumberRepresentation {
     pub value: Number,
     pub representation: String,
