@@ -12,10 +12,11 @@ use std::collections::HashMap;
 // Makes program output as silly as possible
 const SILLY_MODE: bool = true;
 
-pub fn optimize(
-    check_values_up_to: Number,
-    dictionary: &Dictionary,
-) -> HashMap<Number, NumberRepresentation> {
+pub struct OptimizedResult {
+    pub inner: HashMap<Number, NumberRepresentation>,
+}
+
+pub fn optimize(check_values_up_to: Number, dictionary: &Dictionary) -> OptimizedResult {
     let mut map_of_best_solutions: HashMap<Number, NumberRepresentation> = HashMap::new();
 
     // Start by filling map with the default values
@@ -49,7 +50,7 @@ pub fn optimize(
         .max()
         .expect("Couldn't find number with the maximum number of syllables");
 
-    let mut current_limit = 1;
+    let mut current_limit = 2;
 
     while current_limit <= max_limit {
         // Unary operators
@@ -94,7 +95,7 @@ pub fn optimize(
             let candidates = get_candidates_binary(
                 &map_of_best_solutions,
                 operator.clone(),
-                current_limit - 1,
+                current_limit - 2,
                 current_limit,
                 dictionary,
             );
@@ -147,7 +148,9 @@ pub fn optimize(
             .expect("Couldn't find number with the maximum number of syllables");
     }
 
-    map_of_best_solutions
+    OptimizedResult {
+        inner: map_of_best_solutions,
+    }
 }
 
 fn should_update(
@@ -198,132 +201,70 @@ fn get_candidates_binary(
     // already been found, meaning we don't have to search for those numbers as solutions anymore.
 
     // Check syllable length, and prune any combinations that would lead to
-    // a syllable length >  goal.syllable_length
+    // a syllable length > goal.syllable_length
     let operator_length = dictionary
         .get_from_dictionary_operator(Operator::Binary(operator.clone()))
         .unwrap()
         .number_of_syllables;
     let mut result = Vec::new();
 
-    // First: get all candidates N_first where N_first + N_operator < N_goal.
-    // We have found all numbers of length `min_length`, meaning N_first + N_operator can't be
-    // smaller or equal too than `min_length`: N_first + N_operator > min_length
-    // NOTE: we could include the cases where N_first + N_operator == min_length, which
-    // can find alternative solutions (equally optimal). Maybe for SILLY_MODE?
-    let mut first_pass_candidates = Vec::new();
-    for (k, v) in best_solutions {
-        let new_length = v.number_of_syllables + operator_length;
-        if new_length < goal_length /* && (new_length >= min_length) */ {
-            first_pass_candidates.push(k);
+    // Group numbers by syllable length for faster lookup
+    let mut by_length: HashMap<Number, Vec<Number>> = HashMap::new();
+    for (num, representation) in best_solutions {
+        let new_length = representation.number_of_syllables + operator_length;
+        if new_length < goal_length {
+            by_length
+                .entry(representation.number_of_syllables)
+                .or_default()
+                .push(*num);
         }
     }
 
-    // Second pass: get all candidates N_second where N_first + N_operator + N_second < N_goal.
-    // All values in first_pass_candidates are already N_first < N_goal - N_operator.
-    // All values of length `min_length` have been found in a previous iteration, meaning
-    // N_first + N_operator + N_second > min_length
-    // NOTE: This probably has many mirror duplicates, like (5, 2) and (2, 5). Let's not worry
-    // about that for now.
-    for lhs in &first_pass_candidates {
-        let lhs_length = best_solutions.get(lhs).unwrap().number_of_syllables;
-        for rhs in &first_pass_candidates {
-            let rhs_length = best_solutions.get(rhs).unwrap().number_of_syllables;
-            let new_length = lhs_length + rhs_length + operator_length;
-            if (new_length < goal_length) && (new_length > min_length) {
-                result.push((**lhs, **rhs));
+    // Find all LHS values, where N_lhs + N_operator < N_goal
+    for lhs_length in 1..goal_length - operator_length {
+        let Some(lhs_candidates) = by_length.get(&lhs_length) else {
+            continue;
+        };
+
+        // N_lhs + N_rhs + N_operator < N_goal
+        //                      N_rhs < N_goal - N_operator - N_lhs
+        let max_rhs_length = goal_length - operator_length - lhs_length;
+        if max_rhs_length < 1 {
+            continue;
+        }
+
+        // If an operator is commutative, we only need to check RHS >= LHS,
+        // to avoid duplicates (e.g. 5 + 2 and 2 + 5)
+        let min_rhs_length = if operator.is_commutative() {
+            lhs_length
+        } else {
+            1
+        };
+
+        for rhs_length in min_rhs_length..max_rhs_length {
+            let Some(rhs_candidates) = by_length.get(&rhs_length) else {
+                continue;
+            };
+
+            let total_length = lhs_length + rhs_length + operator_length;
+            if total_length <= min_length || total_length >= goal_length {
+                continue;
             }
-        }
-    }
 
-    result
-}
-
-fn get_lhs_candidates(
-    operator: &BinaryOperator,
-    result: Number,
-    max_number_of_syllables: Number,
-    max_lhs: Number,
-    best_solutions: &HashMap<Number, NumberRepresentation>,
-) -> Vec<Number> {
-    let mut candidates: Vec<Number> = Vec::new();
-
-    match operator {
-        BinaryOperator::Add => {
-            // lhs + rhs = result
-            for lhs in 1..=result {
-                if let Some(lhs_representation) = best_solutions.get(&lhs) {
-                    if lhs_representation.number_of_syllables >= max_number_of_syllables {
+            for &lhs in lhs_candidates {
+                for &rhs in rhs_candidates {
+                    // If operator is commutative and the LHS and RHS have the same amount of
+                    // syllables, only include LHS <= RHS.
+                    if operator.is_commutative() && lhs_length == rhs_length && lhs > rhs {
                         continue;
                     }
-                }
-                candidates.push(lhs);
-            }
-        }
-        BinaryOperator::Subtract => {
-            // lhs - rhs = result
-            // => lhs = result + rhs
-            // => lhs >= result
-            for lhs in result..=max_lhs {
-                if let Some(lhs_representation) = best_solutions.get(&lhs) {
-                    if lhs_representation.number_of_syllables >= max_number_of_syllables {
-                        continue;
-                    }
-                }
-                candidates.push(lhs);
-            }
-        }
-        BinaryOperator::Multiply => {
-            // lhs * rhs = result
-            // => lhs = result / rhs
-            // lhs must be a divisor of result
-            for d in divisors(result) {
-                if d <= max_lhs {
-                    candidates.push(d);
-                }
-            }
-        }
-        BinaryOperator::Divide => {
-            // lhs / rhs = result
-            // => lhs = result * rhs
-            // lhs must be a multiple of result
-            let mut k = 1;
-            while let Some(lhs) = result.checked_mul(k) {
-                if lhs > max_lhs {
-                    break;
-                }
-                candidates.push(lhs);
-                k += 1;
-            }
-        }
-        BinaryOperator::Exponent => {
-            // lhs ^ rhs = result
-            // => rhs * log(lhs) = log(result)
-            // => log(lhs) = log(result) / rhs
-            // => lhs = 10 ^ (log(result) / rhs)
 
-            // TODO: actually prune this better
-            for lhs in 1..=max_lhs {
-                candidates.push(lhs);
+                    result.push((lhs, rhs));
+                }
             }
         }
     }
 
-    candidates
-}
-
-fn divisors(x: Number) -> Vec<Number> {
-    // https://read.learnyard.com/dsa/divisors-of-a-number/
-    let mut result = vec![];
-    for i in 1..=x.isqrt() {
-        if x % i == 0 {
-            result.push(i);
-
-            // Check x/i too, and avoid duplicates
-            if i != x / i {
-                result.push(x / i);
-            }
-        }
-    }
     result
 }
 
@@ -340,7 +281,7 @@ mod tests {
         let optimized = optimize(100, &dictionary);
 
         assert_eq!(
-            optimized.get(&3),
+            optimized.inner.get(&3),
             Some(NumberRepresentation {
                 value: 3,
                 number_of_syllables: 1,
@@ -349,7 +290,7 @@ mod tests {
             .as_ref()
         );
         assert_eq!(
-            optimized.get(&81),
+            optimized.inner.get(&81),
             Some(NumberRepresentation {
                 value: 81,
                 number_of_syllables: 2,
@@ -358,7 +299,7 @@ mod tests {
             .as_ref()
         );
         assert_eq!(
-            optimized.get(&27),
+            optimized.inner.get(&27),
             Some(NumberRepresentation {
                 value: 27,
                 number_of_syllables: 2,
@@ -373,19 +314,17 @@ mod tests {
         let dictionary = Dictionary::from_file("en-gb.json");
         let optimized = optimize(100, &dictionary);
 
-        // println!("{:#?}", optimized);
-
-        // My algorithm makes this "six plus five", while TheGrayCubers algorithm makes it
-        // "ten plus one". Both have the same syllies, so it's ok
-        assert_eq!(optimized.get(&11).unwrap().number_of_syllables, 3);
-        assert_eq!(optimized.get(&37).unwrap().number_of_syllables, 4);
+        assert_eq!(optimized.inner.get(&321).unwrap().number_of_syllables, 6);
     }
 
     #[test]
     fn test_hard() {
         let dictionary = Dictionary::from_file("en-gb.json");
-        let optimized = optimize(10000, &dictionary);
+        let optimized = optimize(100000, &dictionary);
 
-        assert_eq!(optimized.get(&1234).unwrap().number_of_syllables, 6);
+        assert_eq!(optimized.inner.get(&2028).unwrap().number_of_syllables, 5);
+
+        assert_eq!(optimized.inner.get(&1225).unwrap().number_of_syllables, 4);
+        assert_eq!(optimized.inner.get(&1234).unwrap().number_of_syllables, 6);
     }
 }
