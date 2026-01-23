@@ -1,4 +1,4 @@
-use crate::math::expression::{self, BinaryOperator, Number, UnaryOperator};
+use crate::math::expression::{BinaryOperator, Number, UnaryOperator};
 use serde::Deserialize;
 use std::{fs::File, io::BufReader, path::Path};
 
@@ -38,7 +38,6 @@ pub struct DictionaryOperator {
 #[derive(Deserialize, Debug)]
 pub struct Dictionary {
     pub constants: Vec<DictionaryConstant>,
-    pub inverse_constants: Vec<DictionaryConstant>,
     pub operators: Vec<DictionaryOperator>,
 }
 
@@ -60,35 +59,6 @@ impl Dictionary {
             }
         }
         None
-    }
-
-    pub fn get_from_operator(&self, operator: &expression::Operator) -> Option<DictionaryOperator> {
-        match operator {
-            expression::Operator::Binary(op, _, _) => {
-                match op {
-                    expression::BinaryOperator::Add => {
-                        self.get_from_dictionary_operator(Operator::Binary(BinaryOperator::Add))
-                    }
-                    expression::BinaryOperator::Subtract => self
-                        .get_from_dictionary_operator(Operator::Binary(BinaryOperator::Subtract)),
-                    expression::BinaryOperator::Multiply => self
-                        .get_from_dictionary_operator(Operator::Binary(BinaryOperator::Multiply)),
-                    expression::BinaryOperator::Divide => {
-                        self.get_from_dictionary_operator(Operator::Binary(BinaryOperator::Divide))
-                    }
-                    expression::BinaryOperator::Exponent => self
-                        .get_from_dictionary_operator(Operator::Binary(BinaryOperator::Exponent)),
-                }
-            }
-            expression::Operator::Unary(op, _) => match op {
-                expression::UnaryOperator::Squared => {
-                    self.get_from_dictionary_operator(Operator::Unary(UnaryOperator::Squared))
-                }
-                expression::UnaryOperator::Cubed => {
-                    self.get_from_dictionary_operator(Operator::Unary(UnaryOperator::Cubed))
-                }
-            },
-        }
     }
 
     pub fn get_from_dictionary_operator(&self, operator: Operator) -> Option<DictionaryOperator> {

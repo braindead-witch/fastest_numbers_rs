@@ -161,13 +161,6 @@
             "number_of_syllables": 2
         }
     ],
-    "inverse_constants": [
-        {
-            "representation": "half",
-            "value": 2,
-            "number_of_syllables": 1
-        }
-    ],
     "operators": [
         {
             "representation": "plus",
