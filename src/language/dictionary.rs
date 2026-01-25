@@ -61,7 +61,7 @@ impl Dictionary {
         None
     }
 
-    pub fn get_from_dictionary_operator(&self, operator: Operator) -> Option<DictionaryOperator> {
+    pub fn get_from_operator(&self, operator: Operator) -> Option<DictionaryOperator> {
         self.operators
             .iter()
             .find(|op| op.operator == operator)
@@ -71,7 +71,7 @@ impl Dictionary {
 
 #[cfg(test)]
 mod tests {
-    use crate::syllables::{
+    use crate::language::{
         Dictionary,
         counter::{NumberRepresentation, value_to_words},
     };

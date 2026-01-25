@@ -1,6 +1,6 @@
 use fastest_numbers::{
     math::{export::ExportType, optimize::optimize, stats::Statistics},
-    syllables::Dictionary,
+    language::Dictionary,
 };
 
 fn main() {

@@ -5,7 +5,7 @@ use crate::{
         export::OptimizedResult,
         expression::{BinaryOperator, Number, UnaryOperator},
     },
-    syllables::{
+    language::{
         Dictionary, Operator,
         counter::{NumberRepresentation, value_to_words},
     },
@@ -176,7 +176,7 @@ fn get_candidates_unary(
     dictionary: &Dictionary,
 ) -> Vec<Number> {
     let operator_length = dictionary
-        .get_from_dictionary_operator(Operator::Unary(operator))
+        .get_from_operator(Operator::Unary(operator))
         .unwrap()
         .number_of_syllables;
     let mut result = Vec::new();
@@ -202,7 +202,7 @@ fn get_candidates_binary(
     // Check syllable length, and prune any combinations that would lead to
     // a syllable length > goal.syllable_length
     let operator_length = dictionary
-        .get_from_dictionary_operator(Operator::Binary(operator.clone()))
+        .get_from_operator(Operator::Binary(operator.clone()))
         .unwrap()
         .number_of_syllables;
     let mut result = Vec::new();
@@ -271,7 +271,7 @@ fn get_candidates_binary(
 mod tests {
     use crate::{
         math::optimize::optimize,
-        syllables::{Dictionary, counter::NumberRepresentation},
+        language::{Dictionary, counter::NumberRepresentation},
     };
 
     #[test]

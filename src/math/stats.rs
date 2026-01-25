@@ -12,16 +12,8 @@ pub struct Statistics {
 impl Statistics {
     pub fn from_optimization_result(results: OptimizedResult) -> Self {
         Statistics {
-            min_number: results
-                .inner
-                .iter()
-                .min_by_key(|k| k.0)
-                .map(|opt| *opt.0),
-            max_number: results
-                .inner
-                .iter()
-                .max_by_key(|k| k.0)
-                .map(|opt| *opt.0),
+            min_number: results.inner.iter().min_by_key(|k| k.0).map(|opt| *opt.0),
+            max_number: results.inner.iter().max_by_key(|k| k.0).map(|opt| *opt.0),
             max_syllables: results
                 .inner
                 .iter()

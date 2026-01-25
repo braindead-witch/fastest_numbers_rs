@@ -3,7 +3,7 @@
 
 use serde::{Deserialize, Serialize};
 
-use crate::{math::expression::Number, syllables::Dictionary};
+use crate::{math::expression::Number, language::Dictionary};
 
 #[derive(PartialEq, Eq, Debug, Clone, Hash, Serialize, Deserialize)]
 pub struct NumberRepresentation {
