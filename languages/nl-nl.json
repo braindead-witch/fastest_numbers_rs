@@ -1,0 +1,201 @@
+{
+    "constants": [
+        {
+            "representation": "nul",
+            "value": 0,
+            "number_of_syllables": 1
+        },
+        {
+            "representation": "een",
+            "value": 1,
+            "number_of_syllables": 1
+        },
+        {
+            "representation": "twee",
+            "value": 2,
+            "number_of_syllables": 1
+        },
+        {
+            "representation": "drie",
+            "value": 3,
+            "number_of_syllables": 1
+        },
+        {
+            "representation": "vier",
+            "value": 4,
+            "number_of_syllables": 1
+        },
+        {
+            "representation": "vijf",
+            "value": 5,
+            "number_of_syllables": 1
+        },
+        {
+            "representation": "zes",
+            "value": 6,
+            "number_of_syllables": 1
+        },
+        {
+            "representation": "zeven",
+            "value": 7,
+            "number_of_syllables": 2
+        },
+        {
+            "representation": "acht",
+            "value": 8,
+            "number_of_syllables": 1
+        },
+        {
+            "representation": "negen",
+            "value": 9,
+            "number_of_syllables": 2
+        },
+        {
+            "representation": "tien",
+            "value": 10,
+            "number_of_syllables": 1
+        },
+        {
+            "representation": "elf",
+            "value": 11,
+            "number_of_syllables": 1
+        },
+        {
+            "representation": "twaalf",
+            "value": 12,
+            "number_of_syllables": 1
+        },
+        {
+            "representation": "dertien",
+            "value": 13,
+            "number_of_syllables": 2
+        },
+        {
+            "representation": "veertien",
+            "value": 14,
+            "number_of_syllables": 2
+        },
+        {
+            "representation": "vijftien",
+            "value": 15,
+            "number_of_syllables": 2
+        },
+        {
+            "representation": "zestien",
+            "value": 16,
+            "number_of_syllables": 2
+        },
+        {
+            "representation": "zeventien",
+            "value": 17,
+            "number_of_syllables": 3
+        },
+        {
+            "representation": "achttien",
+            "value": 18,
+            "number_of_syllables": 2
+        },
+        {
+            "representation": "negentien",
+            "value": 19,
+            "number_of_syllables": 3
+        },
+        {
+            "representation": "twintig",
+            "value": 20,
+            "number_of_syllables": 2
+        },
+        {
+            "representation": "dertig",
+            "value": 30,
+            "number_of_syllables": 2
+        },
+        {
+            "representation": "veertig",
+            "value": 40,
+            "number_of_syllables": 2
+        },
+        {
+            "representation": "vijftig",
+            "value": 50,
+            "number_of_syllables": 2
+        },
+        {
+            "representation": "zestig",
+            "value": 60,
+            "number_of_syllables": 2
+        },
+        {
+            "representation": "zeventig",
+            "value": 70,
+            "number_of_syllables": 3
+        },
+        {
+            "representation": "tachtig",
+            "value": 80,
+            "number_of_syllables": 2
+        },
+        {
+            "representation": "negentig",
+            "value": 90,
+            "number_of_syllables": 3
+        },
+        {
+            "representation": "honderd",
+            "value": 100,
+            "number_of_syllables": 2
+        },
+        {
+            "representation": "duizend",
+            "value": 1000,
+            "number_of_syllables": 2
+        },
+        {
+            "representation": "miljoen",
+            "value": 1000000,
+            "number_of_syllables": 2
+        },
+        {
+            "representation": "miljard",
+            "value": 1000000000,
+            "number_of_syllables": 2
+        }
+    ],
+    "operators": [
+        {
+            "representation": "plus",
+            "operator": { "binary": "add" },
+            "number_of_syllables": 1
+        },
+        {
+            "representation": "min",
+            "operator": { "binary": "subtract" },
+            "number_of_syllables": 1
+        },
+        {
+            "representation": "maal",
+            "operator": { "binary": "multiply" },
+            "number_of_syllables": 1
+        },
+        {
+            "representation": "over",
+            "operator": { "binary": "divide" },
+            "number_of_syllables": 1
+        },
+        {
+            "representation": "tot de",
+            "operator": { "binary": "exponent" },
+            "number_of_syllables": 2
+        },
+        {
+            "representation": "kwadraat",
+            "operator": { "unary": "squared" },
+            "number_of_syllables": 2
+        },
+        {
+            "representation": "tot de derde",
+            "operator": { "unary": "cubed" },
+            "number_of_syllables": 4
+        }
+    ]
+}
