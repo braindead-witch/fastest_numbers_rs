@@ -178,7 +178,7 @@
             "number_of_syllables": 1
         },
         {
-            "representation": "over",
+            "representation": "op",
             "operator": { "binary": "divide" },
             "number_of_syllables": 1
         },
