@@ -2,7 +2,7 @@ use std::{collections::HashMap, fs::File, path::Path};
 
 use serde::{Deserialize, Serialize};
 
-use crate::{math::expression::Number, language::counter::NumberRepresentation};
+use crate::{language::counter::NumberRepresentation, math::expression::Number};
 
 #[derive(Serialize, Deserialize)]
 pub struct OptimizedResult {

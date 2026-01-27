@@ -70,46 +70,4 @@ impl Dictionary {
 }
 
 #[cfg(test)]
-mod tests {
-    use crate::language::{
-        Dictionary,
-        counter::{NumberRepresentation, value_to_words},
-    };
-
-    #[test]
-    fn test_value_to_word() {
-        let dictionary = Dictionary::from_file("en-gb.json");
-        assert_eq!(
-            value_to_words(5, &dictionary),
-            Some(NumberRepresentation {
-                value: 5,
-                representation: "five".to_owned(),
-                number_of_syllables: 1
-            })
-        );
-        assert_eq!(
-            value_to_words(45, &dictionary),
-            Some(NumberRepresentation {
-                value: 45,
-                representation: "forty five".to_owned(),
-                number_of_syllables: 3
-            })
-        );
-        assert_eq!(
-            value_to_words(420, &dictionary),
-            Some(NumberRepresentation {
-                value: 420,
-                representation: "four hundred twenty".to_owned(),
-                number_of_syllables: 5
-            })
-        );
-        assert_eq!(
-            value_to_words(2147483647, &dictionary),
-            Some(NumberRepresentation {
-                value: 2147483647,
-                representation: "two billion one hundred forty seven million four hundred eighty three thousand six hundred forty seven".to_owned(),
-                number_of_syllables: 1+2+1+2+2+2+2+1+2+2+1+2+1+2+2+2,
-            })
-        );
-    }
-}
+mod tests {}

@@ -49,7 +49,7 @@ impl UnaryOperator {
                 } else {
                     Ok(lhs)
                 }
-            },
+            }
             UnaryOperator::Cubed => {
                 let lhs = (x as f64).powf(1.0 / 3.0) as Number; // Try to take cube root
                 if lhs * lhs * lhs != x {
@@ -60,7 +60,7 @@ impl UnaryOperator {
                 } else {
                     Ok(lhs)
                 }
-            },
+            }
         }
     }
 }
@@ -178,4 +178,4 @@ impl BinaryOperator {
 }
 
 #[cfg(test)]
-mod tests { }
+mod tests {}

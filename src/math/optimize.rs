@@ -1,13 +1,13 @@
 // Optimize a given expression (aka the hard part of this program!)
 
 use crate::{
+    language::{
+        Dictionary, Operator,
+        counter::{LanguageRuleset, NumberRepresentation, value_to_words},
+    },
     math::{
         export::OptimizedResult,
         expression::{BinaryOperator, Number, UnaryOperator},
-    },
-    language::{
-        Dictionary, Operator,
-        counter::{NumberRepresentation, value_to_words},
     },
 };
 use std::collections::HashMap;
@@ -15,12 +15,16 @@ use std::collections::HashMap;
 // Makes program output as silly as possible
 const SILLY_MODE: bool = true;
 
-pub fn optimize(check_values_up_to: Number, dictionary: &Dictionary) -> OptimizedResult {
+pub fn optimize(
+    check_values_up_to: Number,
+    dictionary: &Dictionary,
+    ruleset: &LanguageRuleset,
+) -> OptimizedResult {
     let mut map_of_best_solutions: HashMap<Number, NumberRepresentation> = HashMap::new();
 
     // Start by filling map with the default values
     for n in 0..check_values_up_to {
-        let value = value_to_words(n, dictionary);
+        let value = value_to_words(n, dictionary, ruleset);
         if let Some(v) = value {
             map_of_best_solutions.insert(n, v);
         }
@@ -270,14 +274,18 @@ fn get_candidates_binary(
 #[cfg(test)]
 mod tests {
     use crate::{
+        language::{
+            Dictionary,
+            counter::{EnglishRules, LanguageRuleset, NumberRepresentation},
+        },
         math::optimize::optimize,
-        language::{Dictionary, counter::NumberRepresentation},
     };
 
     #[test]
     fn test_unary() {
-        let dictionary = Dictionary::from_file("en-gb.json");
-        let optimized = optimize(100, &dictionary);
+        let dictionary = Dictionary::from_file("languages/en-gb.json");
+        let ruleset = LanguageRuleset::English(EnglishRules);
+        let optimized = optimize(100, &dictionary, &ruleset);
 
         assert_eq!(
             optimized.inner.get(&3),
@@ -310,16 +318,18 @@ mod tests {
 
     #[test]
     fn test_binary() {
-        let dictionary = Dictionary::from_file("en-gb.json");
-        let optimized = optimize(100, &dictionary);
+        let dictionary = Dictionary::from_file("languages/en-gb.json");
+        let ruleset = LanguageRuleset::English(EnglishRules);
+        let optimized = optimize(1000, &dictionary, &ruleset);
 
         assert_eq!(optimized.inner.get(&321).unwrap().number_of_syllables, 6);
     }
 
     #[test]
     fn test_hard() {
-        let dictionary = Dictionary::from_file("en-gb.json");
-        let optimized = optimize(100000, &dictionary);
+        let dictionary = Dictionary::from_file("languages/en-gb.json");
+        let ruleset = LanguageRuleset::English(EnglishRules);
+        let optimized = optimize(100000, &dictionary, &ruleset);
 
         assert_eq!(optimized.inner.get(&2028).unwrap().number_of_syllables, 5);
 
